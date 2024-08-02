@@ -135,15 +135,27 @@ class GestionProductos:
                 print(f"No se encontró el producto {producto}")
                     
         except Exception as e:
-            print("Error al leer el producto: {e}")
+            print("Error al leer el producto: {e}") 
     
-    def actualizar_producto(self, nombre_producto, nuevo_stock):
+    def actualizar_stock_producto(self, nombre_producto, nuevo_stock):
         try:
             datos = self.leer_datos()
             if str(nombre_producto) in datos.keys():
                 datos[nombre_producto]['stock'] = nuevo_stock #hacer validaciones
                 self.guardar_datos(datos)
                 print(f"Stock actualizado: {nombre_producto}")
+            else:
+                print(f"No se encontró el producto {nombre_producto}")            
+        except Exception as e:
+            print(f"Error al actualizar el producto: {e}")
+            
+    def actualizar_precio_producto(self, nombre_producto, nuevo_precio):
+        try:
+            datos = self.leer_datos()
+            if str(nombre_producto) in datos.keys():
+                datos[nombre_producto]['precio'] = nuevo_precio #hacer validaciones
+                self.guardar_datos(datos)
+                print(f"Precio actualizado: {nombre_producto}")
             else:
                 print(f"No se encontró el producto {nombre_producto}")            
         except Exception as e:
