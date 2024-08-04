@@ -1,9 +1,16 @@
 {
     "Radio": {
         "nombre": "Radio",
-        "precio": "$12.00",
-        "stock": "123",
+        "precio": "$5000.00",
+        "stock": 2200,
         "origen": "Coso",
         "fecha_fabricacion": "1989-01-01"
+    },
+    "Tele": {
+        "nombre": "Tele",
+        "precio": 400.0,
+        "stock": 200,
+        "origen": "China",
+        "fecha_fabricacion": "1989-03-12"
     }
 }
