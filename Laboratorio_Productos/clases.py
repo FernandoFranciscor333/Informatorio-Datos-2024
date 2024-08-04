@@ -12,12 +12,13 @@ Persistir los datos en archivo JSON.
 
 
 import json
+from datetime import datetime
 
 class Producto:
     def __init__(self, nombre, precio, stock, origen):
         self.__nombre = nombre
-        self.__precio = precio
-        self.__stock = stock
+        self.__precio = self.validar_precio(precio)
+        self.__stock = self.validar_stock(stock)
         self.__origen = origen
     
     @property    
@@ -26,17 +27,49 @@ class Producto:
     
     @property
     def precio(self):
-        return self.__precio   #que devuelva con puntos y $
+        return f"${self.__precio:,.2f}"    #que devuelva con puntos y $
     
     @property
     def stock(self):
-        return self.__stock   #que devuelva con puntos
+        return f"{self.__stock:,}"   #que devuelva con puntos
     
     @property
     def origen(self):
         return self.__origen.capitalize() 
     
+    #SETTERS
+    
+    @precio.setter
+    def precio(self, nuevo_precio):
+        self.__precio = self.validar_precio(nuevo_precio)  # Corregido
+
+    @stock.setter
+    def stock(self, nuevo_stock):
+        self.__stock = self.validar_stock(nuevo_stock)  # Corregido
+    
     #AÑADIR VALIDACIONES
+    
+    def validar_precio(self, precio):
+        try:
+            precio_num = float(precio)
+            if precio_num <= 0:
+                print("El precio debe ser mayor a igual a 0")
+            else:
+                return precio_num
+        except ValueError:
+            raise ValueError("El salario debe ser un número válido")
+        
+        
+    def validar_stock(self, stock):
+        try:
+            stock_num = int(stock)
+            if stock_num <= 0:
+                print("El precio debe ser mayor a igual a 0")
+            else:
+                return stock_num
+        except ValueError:
+            raise ValueError("El salario debe ser un número válido")        
+
     
     #FUNCIONES
     def to_dict(self):
@@ -53,16 +86,30 @@ class Producto:
 class ProductoElectronico(Producto):
     def __init__(self, nombre, precio, stock, origen, fecha_fabricacion):
         super().__init__(nombre, precio, stock, origen)        
-        self.__fecha_fabricacion = fecha_fabricacion 
+        self.__fecha_fabricacion = self.validar_fecha(fecha_fabricacion)
         
     
     @property
     def fecha_fabricacion(self):
-        return self.__fecha_fabricacion #FORMATO FECHA
+        return self.__fecha_fabricacion 
     
+    @fecha_fabricacion.setter
+    def fecha_fabricacion(self, nueva_fecha):
+        self.__fecha_fabricacion = self.validar_fecha(nueva_fecha)  # Corregido
+    
+    def validar_fecha(self, fecha): #FORMATO FECHA
+        try:
+            fecha_fabricacion = datetime.strptime(fecha,'%Y-%m-%d')
+            fecha_fabricacion = fecha_fabricacion.date()
+            return fecha_fabricacion
+        except Exception as e:
+            print("Ingrese un formato de fecha correcto: dd/mm/aaaa: {e}")
+        
+        
     def to_dict(self):
         data = super().to_dict()
-        data['fecha_fabricacion'] = self.fecha_fabricacion
+        data['fecha_fabricacion'] = self.fecha_fabricacion.isoformat()
+        return data
         
     def __str__(self):
         return f'{super().__str__()} - Fecha de Fabricación: {self.fecha_fabricacion}'
@@ -70,16 +117,30 @@ class ProductoElectronico(Producto):
 class ProductoAlimenticio(Producto):
     def __init__(self, nombre, precio, stock, origen, fecha_vencimiento):
         super().__init__(nombre, precio, stock, origen)        
-        self.__fecha_vencimiento = fecha_vencimiento
+        self.__fecha_vencimiento = self.validar_fecha(fecha_vencimiento)
         
     
     @property
     def fecha_vencimiento(self):
-        return self.__fecha_vencimiento #FORMATO FECHA
+        return self.__fecha_vencimiento 
+       
+    @fecha_vencimiento.setter
+    def fecha_vencimiento(self, nueva_fecha):
+        self.__fecha_vencimiento = self.validar_fecha(nueva_fecha)  # Corregido
+    
+    def validar_fecha(self, fecha): #FORMATO FECHA
+        try: 
+            fecha_vencimiento = datetime.strptime(fecha, '%Y-%m-%d')
+            fecha_vencimiento = fecha_vencimiento.date()
+            return fecha_vencimiento
+        except Exception as e:
+            print("Ingrese un formato de fecha correcto: dd/mm/aaaa: {e}")
+    
     
     def to_dict(self):
         data = super().to_dict()
-        data['fecha_vencimiento'] = self.fecha_vencimiento
+        data['fecha_vencimiento'] = self.fecha_vencimiento.isoformat()
+        return data
         
     def __str__(self):
         return f'{super().__str__()} - Fecha de Vencimiento: {self.fecha_vencimiento}'
@@ -94,19 +155,25 @@ class GestionProductos:
                 datos = json.load(file)            
         except FileNotFoundError:
             return {}
-        except Exception as error:
-            raise Exception(f'Error al leer datos del archivo: {error}')
+        except Exception as e:
+            raise Exception(f'Error al leer datos del archivo: {e}')
         else:
             return datos
     
     def guardar_datos(self, datos):
         try:
             with open(self.archivo, 'w') as file:
-                json.dump(datos, file, indent=4)
+                json.dump(datos, file, indent=4, default=self.serializar_fecha)
         except IOError as error:
             print(f'Error al intentar guardar los datos en {self.archivo}: {error}')
         except Exception as error:
             print(f'Error inesperado: {error}')    
+            
+    @staticmethod
+    def serializar_fecha(obj):
+        if isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
     def crear_producto(self, producto):
         try:

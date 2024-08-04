@@ -1,0 +1,9 @@
+{
+    "Radio": {
+        "nombre": "Radio",
+        "precio": "$12.00",
+        "stock": "123",
+        "origen": "Coso",
+        "fecha_fabricacion": "1989-01-01"
+    }
+}
