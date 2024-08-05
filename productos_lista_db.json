@@ -1,16 +1,16 @@
 {
     "Radio": {
         "nombre": "Radio",
-        "precio": "$5000.00",
-        "stock": 2200,
-        "origen": "Coso",
-        "fecha_fabricacion": "1989-01-01"
+        "precio": 200.0,
+        "stock": 1000,
+        "origen": "Alemania",
+        "fecha_fabricacion": "12-09-1990"
     },
-    "Tele": {
-        "nombre": "Tele",
-        "precio": 400.0,
-        "stock": 200,
-        "origen": "China",
-        "fecha_fabricacion": "1989-03-12"
+    "Queso": {
+        "nombre": "Queso",
+        "precio": 30.0,
+        "stock": 1500,
+        "origen": "Argentina",
+        "fecha_vencimiento": "20-09-2023"
     }
 }

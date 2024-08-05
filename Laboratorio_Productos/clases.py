@@ -47,32 +47,10 @@ class Producto:
 
     @stock.setter
     def stock(self, nuevo_stock):
-        self.__stock = self.validar_stock(nuevo_stock) 
-    
-    #AÑADIR VALIDACIONES
-    
-    # def validar_precio(self, precio):
-    #     try:
-    #         precio_num = float(precio)
-    #         if precio_num <= 0:
-    #             print("El precio debe ser mayor a igual a 0")
-    #         else:
-    #             return precio_num
-    #     except ValueError:
-    #         raise ValueError("El precio debe ser un número válido")
+        self.__stock = self.validar_stock(nuevo_stock)
         
-        
-    # def validar_stock(self, stock):
-    #     try:
-    #         stock_num = int(stock)
-    #         if stock_num <= 0:
-    #             print("El precio debe ser mayor a igual a 0")
-    #         else:
-    #             return stock_num
-    #     except ValueError:
-    #         raise ValueError("El stock debe ser un número válido")        
-    
-    def validar_precio(self, precio):
+    @staticmethod
+    def validar_precio(precio):
         try:
             precio_num = float(precio)
             if precio_num <= 0:
@@ -81,7 +59,8 @@ class Producto:
         except ValueError as e:
             raise ValueError(f"Error en el precio: {str(e)}")
 
-    def validar_stock(self, stock):
+    @staticmethod
+    def validar_stock(stock):
         try:
             stock_num = int(stock)
             if stock_num < 0:
@@ -89,7 +68,7 @@ class Producto:
             return stock_num
         except ValueError as e:
             raise ValueError(f"Error en el stock: {str(e)}")
-
+    
     
     #FUNCIONES
     def to_dict(self):
@@ -111,24 +90,24 @@ class ProductoElectronico(Producto):
     
     @property
     def fecha_fabricacion(self):
-        return self.__fecha_fabricacion 
+        return self.__fecha_fabricacion.strftime('%d-%m-%Y')
     
     @fecha_fabricacion.setter
     def fecha_fabricacion(self, nueva_fecha):
-        self.__fecha_fabricacion = self.validar_fecha(nueva_fecha)  # Corregido
+        self.__fecha_fabricacion = self.validar_fecha(nueva_fecha)
     
-    def validar_fecha(self, fecha): #FORMATO FECHA
-        try:
-            fecha_fabricacion = datetime.strptime(fecha,'%d-%m-%Y')
-            fecha_fabricacion = fecha_fabricacion.date()
-            return fecha_fabricacion
-        except Exception as e:
-            print("Ingrese un formato de fecha correcto: dd/mm/aaaa: {e}")
+    
+    def validar_fecha(self, fecha):
+        try: 
+            fecha_fabricacion = datetime.strptime(fecha, '%d-%m-%Y')
+            return fecha_fabricacion.date()
+        except ValueError:
+            raise ValueError("Ingrese un formato de fecha correcto: dd-mm-aaaa")
         
         
     def to_dict(self):
         data = super().to_dict()
-        data['fecha_fabricacion'] = self.fecha_fabricacion.isoformat()
+        data['fecha_fabricacion'] = self.fecha_fabricacion 
         return data
         
     def __str__(self):
@@ -142,24 +121,23 @@ class ProductoAlimenticio(Producto):
     
     @property
     def fecha_vencimiento(self):
-        return self.__fecha_vencimiento 
+        return self.__fecha_vencimiento.strftime('%d-%m-%Y') 
        
     @fecha_vencimiento.setter
     def fecha_vencimiento(self, nueva_fecha):
-        self.__fecha_vencimiento = self.validar_fecha(nueva_fecha)  # Corregido
-    
-    def validar_fecha(self, fecha): #FORMATO FECHA
+        self.__fecha_vencimiento = self.validar_fecha(nueva_fecha) 
+        
+    def validar_fecha(self, fecha):
         try: 
             fecha_vencimiento = datetime.strptime(fecha, '%d-%m-%Y')
-            fecha_vencimiento = fecha_vencimiento.date()
-            return fecha_vencimiento
-        except Exception as e:
-            print("Ingrese un formato de fecha correcto: dd/mm/aaaa: {e}")
+            return fecha_vencimiento.date()
+        except ValueError:
+            raise ValueError("Ingrese un formato de fecha correcto: dd-mm-aaaa")
     
     
     def to_dict(self):
         data = super().to_dict()
-        data['fecha_vencimiento'] = self.fecha_vencimiento.isoformat()
+        data['fecha_vencimiento'] = self.fecha_vencimiento 
         return data
         
     def __str__(self):
@@ -173,8 +151,7 @@ class GestionProductos:
     def leer_datos(self):
         try:
             with open(self.archivo, 'r') as file:
-                datos = json.load(file)
-            print(f"Datos leídos correctamente: {len(datos)} productos encontrados.")
+                datos = json.load(file)            
             return datos
         except FileNotFoundError:
             print(f"El archivo {self.archivo} no fue encontrado.")
@@ -213,6 +190,7 @@ class GestionProductos:
                 print(f'Producto ({nombre}) ya existe en el inventario')            
         except Exception as error:
             print(f'Error inesperado al crear producto: {error}')
+            raise
     
     def leer_producto(self, nombre_producto):
         try:
@@ -222,15 +200,18 @@ class GestionProductos:
                 if 'fecha_fabricacion' in producto_data:
                     producto = ProductoElectronico(**producto_data) 
                 else:
-                    producto = ProductoAlimenticio(**producto_data)                     
-                print(f"Producto {producto} encontrado")
-            else:
-                print(f"No se encontró el producto {producto}")
+                    producto = ProductoAlimenticio(**producto_data)  
                     
-            if isinstance(producto, ProductoElectronico):
-                print(f"Fecha de fabricación: {producto.fecha_fabricacion}")
-            elif isinstance(producto, ProductoAlimenticio):
-                print(f"Fecha de vencimiento: {producto.fecha_vencimiento}")
+                print(f"Producto encontrado:")
+                print(f"Nombre: {producto.nombre}")
+                print(f"Precio: ${producto.precio}")
+                print(f"Stock: {producto.stock}")
+                print(f"Origen: {producto.origen}")
+                    
+                if isinstance(producto, ProductoElectronico):
+                    print(f"Fecha de fabricación: {producto.fecha_fabricacion}")
+                elif isinstance(producto, ProductoAlimenticio):
+                    print(f"Fecha de vencimiento: {producto.fecha_vencimiento}")
             else:
                 print(f"No se encontró el producto '{nombre_producto}'")
         

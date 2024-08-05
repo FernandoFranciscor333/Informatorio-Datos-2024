@@ -1,5 +1,6 @@
 import os
 import platform
+from datetime import datetime
 
 from clases import (    
     ProductoElectronico,
@@ -24,31 +25,62 @@ def mostrar_menu():
     print(" 7. Mostrar todos los Productos")
     print(" 8. Salir")
     print(" ===============================================================")
-
-def agregar_producto(gestion:GestionProductos, tipo_producto):
+    
+    
+def agregar_producto(gestion: GestionProductos, tipo_producto):
     try:
         nombre = input("Ingrese el nombre del producto: ")
-        precio = float(input("Ingrese el precio del producto: "))
-        stock = int(input("Ingrese el stock del producto: "))
+
+        while True:
+            try:
+                precio = input("Ingrese el precio del producto: ")
+                precio_validado = float(precio)
+                if precio_validado <= 0:
+                    raise ValueError("El precio debe ser mayor a 0")
+                break
+            except ValueError as e:
+                print(f"Error: {e}")
+
+        while True:
+            try:
+                stock = input("Ingrese el stock del producto: ")
+                stock_validado = int(stock)
+                if stock_validado < 0:
+                    raise ValueError("El stock no puede ser negativo")
+                break
+            except ValueError as e:
+                print(f"Error: {e}")
+
         origen = input("Ingrese el país de origen del producto: ")
-        
+
         if tipo_producto == '1':
-            fecha_fabricacion = input("Ingrese la fecha de fabricación del producto (dd-mm-aaaa): ")
-            producto = ProductoElectronico(nombre, precio, stock, origen, fecha_fabricacion)
+            while True:
+                try:
+                    fecha_fabricacion = input("Ingrese la fecha de fabricación del producto (dd-mm-aaaa): ")
+                    producto = ProductoElectronico(nombre, precio_validado, stock_validado, origen, fecha_fabricacion)
+                    break
+                except ValueError as e:
+                    print(f"Error: {e}")
         elif tipo_producto == '2':
-            fecha_vencimiento = input("Ingrese la fecha de caducidad del producto (dd-mm-aaaa): ")
-            producto = ProductoAlimenticio(nombre, precio, stock, origen, fecha_vencimiento)
+            while True:
+                try:
+                    fecha_vencimiento = input("Ingrese la fecha de caducidad del producto (dd-mm-aaaa): ")
+                    producto = ProductoAlimenticio(nombre, precio_validado, stock_validado, origen, fecha_vencimiento)
+                    break
+                except ValueError as e:
+                    print(f"Error: {e}")
         else:
             print("Opción inválida")
             return
-        
+
         gestion.crear_producto(producto)
-        input("Presione Enter para continuar...")
-        
-    except ValueError as e:
-        print(f"Error: {e}")
+        print(f"Producto {nombre} creado exitosamente.")
+
     except Exception as e:
         print(f"Error inesperado: {e}")
+    finally:
+        input("Presione Enter para continuar...")
+
         
 def buscar_producto_por_nombre(gestion):
     nombre = input("ingrese el nombre del producto: ")
