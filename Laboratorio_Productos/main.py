@@ -93,7 +93,7 @@ def actualizar_precio_producto(gestion):
     
     if nombre in datos:
         producto = datos[nombre]
-        precio_actual = float(producto['precio'].replace('$', '').replace(',', ''))
+        precio_actual = float(producto['precio'])
         
         print(f"Precio actual de {nombre}: ${precio_actual:.2f}")
         
